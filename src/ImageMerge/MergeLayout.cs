@@ -7,21 +7,25 @@ namespace Deepleo.ImageMerge
     /// <summary>
     /// 合并布局枚举
     /// </summary>
-    public enum Merge2LayoutEnum
+    public enum MergeLayoutEnum
     {
+        /// <summary>
+        /// 一张图片，如果小于目标尺寸放在中间
+        /// </summary>
+        Merge1C = 1,
         /// <summary>
         /// 2张图片，上下各1个长方形
         ///  ———————————————————
         /// |                  |
-        /// |        R1        |
+        /// |      Top  R1     |
         /// |                  |
         ///  ———————————————————
         /// |                  |
-        /// |        R2        |
+        /// |     Bottom   R2  |
         /// |                  |
         ///  ———————————————————
         /// </summary>
-        Merge2R1 = 1,
+        Merge2TB = 2,
 
         /// <summary>
         /// 2张图片，左右各1个长方形
@@ -31,15 +35,11 @@ namespace Deepleo.ImageMerge
         /// |         |        |
         /// |    R1   |   R2   |
         /// |         |        |
-        /// |         |        |
+        /// |   Left  |  Right |
         /// |         |        |
         ///  ———————————————————
         /// </summary>
-        Merge2R2 = 2
-    }
-
-    public enum Merge3LayoutEnum
-    {
+        Merge2LR = 3,
 
         /// <summary>
         /// 3张图片， 上面一个长方形，下面2个正方形并排
@@ -53,7 +53,7 @@ namespace Deepleo.ImageMerge
         /// |         |        |
         ///  ———————————————————
         /// </summary>
-        Merge1R2S1 = 3,
+        Merge3T1B2 = 4,
 
         /// <summary>
         /// 3张图片，上面2个正方形并排，下面一个长方形
@@ -67,8 +67,7 @@ namespace Deepleo.ImageMerge
         /// |                  |
         /// ———————————————————
         /// </summary>
-        Merge1R2S2 = 4,
-
+        Merge3T2B1 = 5,
 
         /// <summary>
         /// 3张图片，上面2个正方形并排，下面一个长方形
@@ -82,8 +81,7 @@ namespace Deepleo.ImageMerge
         /// |         |        |
         ///  ———————————————————
         /// </summary>
-        Merge1R2S3 = 5,
-
+        Merge3L1R2 = 6,
 
         /// <summary>
         /// 3张图片，上面2个正方形并排，下面一个长方形
@@ -97,11 +95,8 @@ namespace Deepleo.ImageMerge
         /// |         |        |
         ///  ———————————————————
         /// </summary>
-        Merge1R2S4 = 6
-    }
+        Merge3L2R1 = 7,
 
-    public enum Merge4LayoutEnum
-    {
         /// <summary>
         /// 4张图片，上面一个长方形，下面2个正方形并排
         ///  ———————————————————
@@ -114,7 +109,36 @@ namespace Deepleo.ImageMerge
         /// |         |        |
         ///  ———————————————————
         /// </summary>
-        Merge4S = 7
+        Merge4S = 8,
 
+        /// <summary>
+        /// 8张图片 上4 下4
+        /// ————————————————————
+        /// |    |    |    |    |
+        /// |    |    |    |    |
+        /// —————————————————————
+        /// |    |    |    |    |
+        /// |    |    |    |    |
+        /// —————————————————————
+        /// </summary>
+        Merge8T4B4 = 9,
+
+        /// <summary>
+        /// 8张图片 左4右4
+        /// ——————————— 
+        /// |    |    |     
+        /// |    |    |    
+        /// ——————————— 
+        /// |    |    |   
+        /// |    |    |  
+        /// ——————————— 
+        /// |    |    |     
+        /// |    |    |    
+        /// ——————————— 
+        /// |    |    |     
+        /// |    |    |    
+        /// ——————————— 
+        /// </summary>
+        Merge8L4R4 = 10,
     }
 }

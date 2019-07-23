@@ -1,6 +1,10 @@
 ﻿using Deepleo.ImageMerge;
 using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Globalization;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace ImageMerge.ConsoleTest
 {
@@ -8,33 +12,40 @@ namespace ImageMerge.ConsoleTest
     {
         static void Main(string[] args)
         {
-            testLocal();
-            testNewwork();
+            var dir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "images");
+            var files = Directory.GetFiles(dir);
+            var images = new List<string>(files);
+            TestLocal(images).ConfigureAwait(false).GetAwaiter().GetResult();
+            //TestNewwork();
         }
 
         /// <summary>
         /// 测试网络图片
         /// 如果遇到网络图片过期，请更换图片地址即可
         /// </summary>
-        private static void testNewwork()
+        private static async Task TestNewwork()
         {
             var dir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "images");
-            var images = new string[4] {
+            var images = new List<string>()  {
                "https://avatars2.githubusercontent.com/u/5965882?s=460&v=4",
                "https://avatars2.githubusercontent.com/u/2503423?s=460&v=4",
                "https://avatars2.githubusercontent.com/u/499550?s=460&v=4",
                "https://avatars2.githubusercontent.com/u/233907?s=400&v=4" };
+            Size size = new Size(400, 400);
+            var path = "网络图片";
+            await TestMerge(path, images, MergeLayoutEnum.Merge1C, size);
+            await TestMerge(path, images, MergeLayoutEnum.Merge2LR, size);
+            await TestMerge(path, images, MergeLayoutEnum.Merge2TB, size);
 
-            testMerge2("网络图片", images[0], images[1], Merge2LayoutEnum.Merge2R1);
+            await TestMerge(path, images, MergeLayoutEnum.Merge3L1R2, size);
+            await TestMerge(path, images, MergeLayoutEnum.Merge3L2R1, size);
+            await TestMerge(path, images, MergeLayoutEnum.Merge3T1B2, size);
+            await TestMerge(path, images, MergeLayoutEnum.Merge3T2B1, size);
 
-            testMerge2("网络图片", images[0], images[1], Merge2LayoutEnum.Merge2R2);
+            await TestMerge(path, images, MergeLayoutEnum.Merge4S, size);
 
-            testMerge3("网络图片", images[0], images[1], images[2], Merge3LayoutEnum.Merge1R2S1);
-            testMerge3("网络图片", images[0], images[1], images[2], Merge3LayoutEnum.Merge1R2S2);
-            testMerge3("网络图片", images[0], images[1], images[2], Merge3LayoutEnum.Merge1R2S3);
-            testMerge3("网络图片", images[0], images[1], images[2], Merge3LayoutEnum.Merge1R2S4);
-
-            testMerge4("网络图片", images[0], images[1], images[2], images[3], Merge4LayoutEnum.Merge4S);
+            await TestMerge(path, images, MergeLayoutEnum.Merge8L4R4, new Size(400, 400));
+            await TestMerge(path, images, MergeLayoutEnum.Merge8T4B4, new Size(400, 200));
 
             Console.WriteLine("网络图片测试完成");
         }
@@ -42,61 +53,36 @@ namespace ImageMerge.ConsoleTest
         /// <summary>
         /// 测试本地图片
         /// </summary>
-        private static void testLocal()
+        private static async Task TestLocal(List<string> images)
         {
-            var dir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "images");
-            var images = new string[4] {
-               Path.Combine(dir,"1.jpg"),
-               Path.Combine(dir,"2.jpg"),
-               Path.Combine(dir,"3.png"),
-               Path.Combine(dir,"4.png") };
+            Size size = new Size(400, 400);
+            var path = "本地图片";
+            await TestMerge(path, images, MergeLayoutEnum.Merge1C, size);
+            await TestMerge(path, images, MergeLayoutEnum.Merge2LR, size);
+            await TestMerge(path, images, MergeLayoutEnum.Merge2TB, size);
 
-            testMerge2("本地图片",images[0], images[1], Merge2LayoutEnum.Merge2R1);
-            testMerge2("本地图片", images[0], images[1], Merge2LayoutEnum.Merge2R2);
+            await TestMerge(path, images, MergeLayoutEnum.Merge3L1R2, size);
+            await TestMerge(path, images, MergeLayoutEnum.Merge3L2R1, size);
+            await TestMerge(path, images, MergeLayoutEnum.Merge3T1B2, size);
+            await TestMerge(path, images, MergeLayoutEnum.Merge3T2B1, size);
 
-            testMerge3("本地图片", images[0], images[1], images[2], Merge3LayoutEnum.Merge1R2S1);
-            testMerge3("本地图片", images[0], images[1], images[2], Merge3LayoutEnum.Merge1R2S2);
-            testMerge3("本地图片", images[0], images[1], images[2], Merge3LayoutEnum.Merge1R2S3);
-            testMerge3("本地图片", images[0], images[1], images[2], Merge3LayoutEnum.Merge1R2S4);
+            await TestMerge(path, images, MergeLayoutEnum.Merge4S, size);
 
-            testMerge4("本地图片", images[0], images[1], images[2], images[3], Merge4LayoutEnum.Merge4S);
+            await TestMerge(path, images, MergeLayoutEnum.Merge8L4R4, new Size(400, 400));
+            await TestMerge(path, images, MergeLayoutEnum.Merge8T4B4, new Size(400, 200));
 
             Console.WriteLine("本地图片测试完成");
         }
 
-        private static void testMerge2(string type, string img1, string img2, Merge2LayoutEnum layout = Merge2LayoutEnum.Merge2R1)
+        private static async Task TestMerge(string type, List<string> imagePath, MergeLayoutEnum layout, Size size)
         {
-            var m1 = MergeProvider.Merge2Images(img1, img2, layout, 250);
-            var image1 = MergeProvider.ConvertToImage(m1);
+            var m1 = await ImageMergeHelper.MergeImagesAsync(imagePath, layout, size);
             var m1Path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, type + "-" + layout.ToString() + ".png");
             if (File.Exists(m1Path))
             {
                 File.Delete(m1Path);
             }
-            image1.Save(m1Path);
-        }
-
-        private static void testMerge3(string type, string img1, string img2, string img3, Merge3LayoutEnum layout = Merge3LayoutEnum.Merge1R2S1)
-        {
-            var m1 = MergeProvider.Merge3Images(img1, img2, img3, layout, 250);
-            var image1 = MergeProvider.ConvertToImage(m1);
-            var m1Path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, type + "-" + layout.ToString() + ".png");
-            if (File.Exists(m1Path))
-            {
-                File.Delete(m1Path);
-            }
-            image1.Save(m1Path);
-        }
-        private static void testMerge4(string type, string img1, string img2, string img3, string img4, Merge4LayoutEnum layout = Merge4LayoutEnum.Merge4S)
-        {
-            var m1 = MergeProvider.Merge4Images(img1, img2, img3, img4, layout, 250);
-            var image1 = MergeProvider.ConvertToImage(m1);
-            var m1Path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, type + "-" + layout.ToString() + ".png");
-            if (File.Exists(m1Path))
-            {
-                File.Delete(m1Path);
-            }
-            image1.Save(m1Path);
+            m1.Save(m1Path);
         }
     }
 }
